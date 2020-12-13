@@ -4,8 +4,9 @@ Upload your .apk/.aab file to Huawei App Gallery
 
 ## Before using the step
 
-Make sure you set your project as `N/A` : in App Gallery Connect, go to **User and Permissions -> API Client -> Create**
-Add the role `Administrator` to this new API Client created.
+Make sure you set up your project as `N/A`. To do so, in App Gallery Connect select the top option **User and Permissions -> API Client -> Create**
+
+Add the role `Administrator` to this new `API Client` created.
 
 
 ## How to use this Step
