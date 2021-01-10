@@ -85,10 +85,8 @@ function showResponseOrSubmitCompletelyAgain()
 {
   RET_CODE=`jq -r '.ret.code' resultSubmission.json`
   RET_MESSAGE=`jq -r '.ret.msg' resultSubmission.json` 
-  printf "${RET_CODE}"
-  printf "${RET_MESSAGE}"
 
-  if [ RET_CODE == 204144660 ] && [[ RET_MESSAGE =~ "It may take 2-5 minutes" ]] ;then
+  if [[ "${RET_CODE}" == "204144660" ]] && [[ "${RET_MESSAGE}" =~ "It may take 2-5 minutes" ]]  ;then
     printf "\nBuild is currently processing, waiting for 2 minutes before submitting again...\n" 
     sleep 120
     submitApp  $1 $2 $3
@@ -102,7 +100,7 @@ function showResponseOrSubmitCompletelyAgain()
     printf "\nSuccessfully submitted app for review\n" 
   else 
     printf "\nFailed to Submit App Completely.\n" 
-    printf `jq -r '.ret.msg' resultSubmission.json`
+    printf "${RET_MESSAGE}"
   fi
 }
 
