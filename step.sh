@@ -6,16 +6,6 @@ if [ "${show_debug_logs}" == "yes" ]; then
   set -x
 fi
 
-# it checks whether a string contains another one or not
-function containsWait()
-{
-    if [[ $1 == *$2* ]]; then
-      return 0
-    else
-      return 1
-    fi 
-}
-
 function getToken()
 {
   printf "\n\nObtaining a Token\n"
@@ -83,43 +73,36 @@ function updateAppFileInfo()
   printf "\nUpdating App File Information - With the previoulsy uploaded file - DONE"
 }
 
-function submitForReview()
+function submitApp()
 {
-  printf "\nSubmit for Review\n" 
-
-  curl --location --request POST \
+  curl --silent -X  POST \
     'https://connect-api.cloud.huawei.com/api/publish/v2/app-submit?appid='$1'' \
     -H 'Authorization: Bearer '$2'' \
-    -H 'client_id: '$3''> resultDraftSubmission.json
-
-  printf "\nSubmit for Review - DONE\n" 
-}
-
-function submitCompletely()
-{
-  curl --location --request POST \
-    'https://connect-api.cloud.huawei.com/api/publish/v2/app-submit?appid='$1'' \
-    -H 'Authorization: Bearer '$2'' \
-    -H 'client_id: '$3''> resultSubmission.json 
-}
+    -H 'client_id: '$3''> resultSubmission.json
+} 
 
 function showResponseOrSubmitCompletelyAgain()
 {
-  if  $1 -eq 204144660  &&  containsWait $2 "It may take 2-5 minutes"  ;then
+  RET_CODE=`jq -r '.ret.code' resultSubmission.json`
+  RET_MESSAGE=`jq -r '.ret.msg' resultSubmission.json` 
+  printf "${RET_CODE}"
+  printf "${RET_MESSAGE}"
+
+  if [ RET_CODE == 204144660 ] && [[ RET_MESSAGE =~ "It may take 2-5 minutes" ]] ;then
     printf "\nBuild is currently processing, waiting for 2 minutes before submitting again...\n" 
     sleep 120
-    submitCompletely  $3 $4 $5
+    submitApp  $1 $2 $3
+
     CODE=`jq -r '.ret.code' resultSubmission.json`
     MESSAGE=`jq -r '.ret.msg' resultSubmission.json`
-
     printf "\nFinal SubmitRetCode - ${CODE}\n" 
     printf "\nFinal SubmitRetMessage - ${MESSAGE}\n" 
 
-  elif [ $1 -eq 0 ] ;then 
+  elif [[ $1 == 0 ]] ;then 
     printf "\nSuccessfully submitted app for review\n" 
   else 
     printf "\nFailed to Submit App Completely.\n" 
-    printf $2
+    printf `jq -r '.ret.msg' resultSubmission.json`
   fi
 }
 
@@ -144,20 +127,13 @@ FILE_SIZE=`jq -r '.result.UploadFileRsp.fileInfoList[0].size' uploadfile.json`
 
 # 4. Update App File Information
 updateAppFileInfo "${FILENAME_TO_UPLOAD}" "$huawei_app_id" "${ACCESS_TOKEN}" "${huawei_client_id}" "${releaseType}" "$FILE_DEST_URL" "$FILE_SIZE"
-FILE_UPLOAD_CODE=`jq -r '.ret.code' result.json`
-FILE_UPLOAD_MSG=`jq -r '.ret.msg' result.json`
 
 # 5. Submit App for Review (Draft)
-submitForReview "$huawei_app_id" "${ACCESS_TOKEN}" "${huawei_client_id}"
-RET_CODE=`jq -r '.ret.code' resultDraftSubmission.json`
-RET_MESSAGE=`jq -r '.ret.msg' resultDraftSubmission.json`
+printf "\nSubmit for Review\n" 
+submitApp "$huawei_app_id" "${ACCESS_TOKEN}" "${huawei_client_id}"
+printf "\nSubmit for Review - DONE\n" 
 
-# 6. Submit App Completely
-submitCompletely "$huawei_app_id" "${ACCESS_TOKEN}" "${huawei_client_id}"
-SUBMIT_RET_CODE=`jq -r '.ret.code' resultSubmission.json`
-SUBMIT_RET_MESSAGE=`jq -r '.ret.msg' resultSubmission.json`
-
-# 7. Wait 2 mins to try again or show Response Message
-showResponseOrSubmitCompletelyAgain "${SUBMIT_RET_CODE}" "${SUBMIT_RET_MESSAGE}" "$huawei_app_id" "${ACCESS_TOKEN}" "${huawei_client_id}" 
+# 6. show Response Message or wait 2 mins to try again
+showResponseOrSubmitCompletelyAgain "$huawei_app_id" "${ACCESS_TOKEN}" "${huawei_client_id}"
 
 exit 0
