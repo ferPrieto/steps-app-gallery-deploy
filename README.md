@@ -1,6 +1,8 @@
 # Huawei App Gallery Deploy Step
 
-Deploy your .apk/.aab file to Huawei App Gallery
+Deploy your .apk/.aab file to **Huawei App Gallery**.
+
+:robot:This is the code base of the **Verified** Bitrise Step:robot:
 
 # Upcoming features
 
