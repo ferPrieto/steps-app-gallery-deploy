@@ -96,7 +96,7 @@ function showResponseOrSubmitCompletelyAgain()
     printf "\nFinal SubmitRetCode - ${CODE}\n" 
     printf "\nFinal SubmitRetMessage - ${MESSAGE}\n" 
 
-  elif [[ $1 == 0 ]] ;then 
+  elif [[ "${RET_CODE}" == 0 ]] ;then 
     printf "\nSuccessfully submitted app for review\n" 
   else 
     printf "\nFailed to Submit App Completely.\n" 
