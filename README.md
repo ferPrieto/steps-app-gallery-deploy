@@ -1,6 +1,14 @@
 # Huawei App Gallery Deploy Step
 
-Upload your .apk/.aab file to Huawei App Gallery
+Deploy your .apk/.aab file to **Huawei App Gallery**.
+
+:robot:This is the code base of the **Verified** Bitrise Step:robot:
+
+# Upcoming features
+
+* Release App :rocket: **Already Available!** - Submit an .apk/.abb completely (not just a draft).
+* Phased Release - It will allow to select a rollout percentage and rollout start-end date.
+* Release Schedule - It will allow to select a specific date to submit the whole release.
 
 ## Before using the step
 
