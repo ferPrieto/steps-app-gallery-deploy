@@ -25,48 +25,57 @@ function getToken()
 
 function getFileUploadUrl()
 {
+  ACCESS_TOKEN=`jq -r '.access_token' token.json`
+
   printf "\nObtaining the File Upload URL\n"
 
   curl --silent -X GET \
   'https://connect-api.cloud.huawei.com/api/publish/v2/upload-url?appId='$1'&suffix='$2 \
-  -H 'Authorization: Bearer '$3'' \
-  -H 'client_id: '$4'' > uploadurl.json
+  -H 'Authorization: Bearer '"${ACCESS_TOKEN}"'' \
+  -H 'client_id: '$3'' > uploadurl.json
 
   printf "\nObtaining the File Upload URL - DONE\n"
 }
 
 function uploadFile()
 {
+  UPLOAD_URL=`jq -r '.uploadUrl' uploadurl.json`
+  UPLOAD_AUTH_CODE=`jq -r '.authCode' uploadurl.json` 
+
   printf "\nUploading a File\n"
 
   curl --silent -X POST \
-    $1 \
+    "${UPLOAD_URL}" \
     -H 'Accept: application/json' \
-    -F authCode=$2 \
+    -F authCode="${UPLOAD_AUTH_CODE}" \
     -F fileCount=1 \
     -F parseType=1 \
-    -F file=@$3 > uploadfile.json
+    -F file=@$1 > uploadfile.json
   
   printf "\nUploading a File - DONE\n"  
 }
 
 function updateAppFileInfo()
 {
+  ACCESS_TOKEN=`jq -r '.access_token' token.json`
+  FILE_DEST_URL=`jq -r '.result.UploadFileRsp.fileInfoList[0].fileDestUlr' uploadfile.json`
+  FILE_SIZE=`jq -r '.result.UploadFileRsp.fileInfoList[0].size' uploadfile.json`
+
   printf "\nUpdating App File Information - With the previoulsy uploaded file: ${1}"
 
   curl --silent -X PUT \
     'https://connect-api.cloud.huawei.com/api/publish/v2/app-file-info?appId='$2'' \
-    -H 'Authorization: Bearer '$3'' \
+    -H 'Authorization: Bearer '"${ACCESS_TOKEN}"'' \
     -H 'Content-Type: application/json' \
-    -H 'client_id: '$4'' \
-    -H 'releaseType: '$5'' \
+    -H 'client_id: '$3'' \
+    -H 'releaseType: '$4'' \
     -d '{
     "fileType":"5",
     "files":[
       {
         "fileName":"'$1'",
-        "fileDestUrl":"'$6'",
-        "size":"'$7'"
+        "fileDestUrl":"'"${FILE_DEST_URL}"'",
+        "size":"'"${FILE_SIZE}"'"
       }]
   }' > result.json
 
@@ -74,22 +83,25 @@ function updateAppFileInfo()
 }
 
 function submitApp()
-{
+{  
+  ACCESS_TOKEN=`jq -r '.access_token' token.json`
+
   curl --silent -X  POST \
     'https://connect-api.cloud.huawei.com/api/publish/v2/app-submit?appid='$1'' \
-    -H 'Authorization: Bearer '$2'' \
-    -H 'client_id: '$3''> resultSubmission.json
+    -H 'Authorization: Bearer '"${ACCESS_TOKEN}"'' \
+    -H 'client_id: '$2''> resultSubmission.json
 } 
 
 function showResponseOrSubmitCompletelyAgain()
 {
+  ACCESS_TOKEN=`jq -r '.access_token' token.json`
   RET_CODE=`jq -r '.ret.code' resultSubmission.json`
   RET_MESSAGE=`jq -r '.ret.msg' resultSubmission.json` 
 
   if [[ "${RET_CODE}" == "204144660" ]] && [[ "${RET_MESSAGE}" =~ "It may take 2-5 minutes" ]]  ;then
     printf "\nBuild is currently processing, waiting for 2 minutes before submitting again...\n" 
     sleep 120
-    submitApp  $1 $2 $3
+    submitApp  $1 $2
 
     CODE=`jq -r '.ret.code' resultSubmission.json`
     MESSAGE=`jq -r '.ret.msg' resultSubmission.json`
@@ -97,7 +109,7 @@ function showResponseOrSubmitCompletelyAgain()
     printf "\nFinal SubmitRetMessage - ${MESSAGE}\n" 
 
   elif [[ "${RET_CODE}" == 0 ]] ;then 
-    printf "\nSuccessfully submitted app for review\n" 
+    printf "\App Successfully Submitted For Review\n" 
   else 
     printf "\nFailed to Submit App Completely.\n" 
     printf "${RET_MESSAGE}"
@@ -109,29 +121,18 @@ LANG="${lang}"
 FILENAME_TO_UPLOAD="${huawei_filename}"
 FILE_EXT="${file_path##*.}"
 
-# 1. Get Token
 getToken  "${huawei_client_id}" "${huawei_client_secret}"
-ACCESS_TOKEN=`jq -r '.access_token' token.json`
 
-# 2. Get File Upload Url
-getFileUploadUrl "${huawei_app_id}" "${FILE_EXT}" "${ACCESS_TOKEN}" "${huawei_client_id}"
-UPLOAD_URL=`jq -r '.uploadUrl' uploadurl.json`
-UPLOAD_AUTH_CODE=`jq -r '.authCode' uploadurl.json` 
+getFileUploadUrl "${huawei_app_id}" "${FILE_EXT}" "${huawei_client_id}"
 
-# 3. Upload .apk/.aab File
-uploadFile "${UPLOAD_URL}" "${UPLOAD_AUTH_CODE}" "${file_path}"
-FILE_DEST_URL=`jq -r '.result.UploadFileRsp.fileInfoList[0].fileDestUlr' uploadfile.json`
-FILE_SIZE=`jq -r '.result.UploadFileRsp.fileInfoList[0].size' uploadfile.json`
+uploadFile "${file_path}"
 
-# 4. Update App File Information
-updateAppFileInfo "${FILENAME_TO_UPLOAD}" "$huawei_app_id" "${ACCESS_TOKEN}" "${huawei_client_id}" "${releaseType}" "$FILE_DEST_URL" "$FILE_SIZE"
+updateAppFileInfo "${FILENAME_TO_UPLOAD}" "$huawei_app_id" "${huawei_client_id}" "${releaseType}"
 
-# 5. Submit App for Review (Draft)
-printf "\nSubmit for Review\n" 
-submitApp "$huawei_app_id" "${ACCESS_TOKEN}" "${huawei_client_id}"
-printf "\nSubmit for Review - DONE\n" 
+printf "\nSubmitting app...\n" 
+submitApp "$huawei_app_id" "${huawei_client_id}"
+printf "\nApp submitted as a Draft - Pending of being Submitted for Review\n" 
 
-# 6. show Response Message or wait 2 mins to try again
-showResponseOrSubmitCompletelyAgain "$huawei_app_id" "${ACCESS_TOKEN}" "${huawei_client_id}"
+showResponseOrSubmitCompletelyAgain "$huawei_app_id" "${huawei_client_id}"
 
 exit 0
