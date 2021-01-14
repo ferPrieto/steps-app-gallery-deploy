@@ -7,6 +7,7 @@ description: |-
 website: https://github.com/ferPrieto/steps-app-gallery-deploy
 source_code_url: https://github.com/ferPrieto/steps-app-gallery-deploy
 support_url: https://github.com/ferPrieto/steps-app-gallery-deploy/issues
+published_at: 2021-01-14T10:03:16.844179195Z
 host_os_tags:
   - osx-10.10
   - ubuntu-16.04
@@ -21,7 +22,7 @@ type_tags:
   - deploy
 
 is_requires_admin_user: true
-is_always_run: false
+is_always_run: true
 is_skippable: false
 run_if: ""
 
@@ -93,7 +94,7 @@ inputs:
       title: Release Type
       description: App release mode (1 - on the entire network | 3 - by phase)[Release Type](https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-app-submit-with-file_v2)
       is_expand: true
-      is_required: false
+      is_required: false 
 
   - show_debug_logs: "no"
     opts:
