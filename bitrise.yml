@@ -11,9 +11,10 @@ app:
   - LANG: ${LANG}
   - SHOW_DEBUG_LOGS: ${SHOW_DEBUG_LOGS}
   - RELEASE_TYPE: ${RELEASE_TYPE}
+  - SUBMIT_FOR_REVIEW: ${SUBMIT_FOR_REVIEW}
   # If you want to share this step into a StepLib
   - BITRISE_STEP_ID: steps-app-gallery-deploy
-  - BITRISE_STEP_VERSION: "1.0.0"
+  - BITRISE_STEP_VERSION: "1.5.0"
   - BITRISE_STEP_GIT_CLONE_URL: https://github.com/ferPrieto/steps-app-gallery-deploy.git
   - MY_STEPLIB_REPO_FORK_GIT_URL: $MY_STEPLIB_REPO_FORK_GIT_URL
 
@@ -48,7 +49,7 @@ workflows:
         - lang: ${LANG}
         - show_debug_logs: ${SHOW_DEBUG_LOGS}
         - releaseType: ${RELEASE_TYPE}
-
+        - submit_for_review: ${SUBMIT_FOR_REVIEW}
 
   # ----------------------------------------------------------------
   # --- workflows to Share this step into a Step Library

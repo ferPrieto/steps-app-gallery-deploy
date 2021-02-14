@@ -99,14 +99,30 @@ function showResponseOrSubmitCompletelyAgain()
   RET_MESSAGE=`jq -r '.ret.msg' resultSubmission.json` 
 
   if [[ "${RET_CODE}" == "204144660" ]] && [[ "${RET_MESSAGE}" =~ "It may take 2-5 minutes" ]]  ;then
-    printf "\nBuild is currently processing, waiting for 2 minutes before submitting again...\n" 
-    sleep 120
-    submitApp  $1 $2
+    getSubmissionStatus  $1 $2
+    SUBMISSION_STATUS=`jq -r '.aabCompileStatus' resultSubmissionStatus.json`
+    printf "Submission Status ${SUBMISSION_STATUS}"
+    i=0
+    while [[ "${SUBMISSION_STATUS}" == "1" ]] && [[ i < 8 ]]
+      do
+          printf "${i}"
+          sleep 60
+          SUBMISSION_STATUS = getSubmissionStatus $1 $2
+          printf "\nBuild is currently processing, waiting another minute before submitting again...\n" 
+          ((i++))
+      done
 
-    CODE=`jq -r '.ret.code' resultSubmission.json`
-    MESSAGE=`jq -r '.ret.msg' resultSubmission.json`
-    printf "\nFinal SubmitRetCode - ${CODE}\n" 
-    printf "\nFinal SubmitRetMessage - ${MESSAGE}\n" 
+    if [ "${SUBMISSION_STATUS}" == "2" ]; then
+
+        submitApp  $1 $2 
+        CODE=`jq -r '.ret.code' resultSubmission.json`
+        MESSAGE=`jq -r '.ret.msg' resultSubmission.json`
+
+        printf "\nFinal SubmitRetCode - ${CODE}\n" 
+        printf "\nFinal SubmitRetMessage - ${MESSAGE}\n" 
+    else 
+          printf "\nFailed to Submit App Completely.\n" 
+    fi 
 
   elif [[ "${RET_CODE}" == 0 ]] ;then 
     printf "\App Successfully Submitted For Review\n" 
@@ -114,6 +130,17 @@ function showResponseOrSubmitCompletelyAgain()
     printf "\nFailed to Submit App Completely.\n" 
     printf "${RET_MESSAGE}"
   fi
+}
+
+function getSubmissionStatus()
+{
+   ACCESS_TOKEN=`jq -r '.access_token' token.json`
+   PKG_VERSION=`jq -r '.pkgVersion[0]' result.json`
+
+   curl --silent -X  GET \
+   'https://connect-api.cloud.huawei.com/api/publish/v2/aab/complile/status?appId='$1'&pkgVersion='"${PKG_VERSION}"'' \
+    -H 'Authorization: Bearer '"${ACCESS_TOKEN}"'' \
+    -H 'client_id: '$2''> resultSubmissionStatus.json
 }
 
 # Setup env vars
@@ -133,6 +160,8 @@ printf "\nSubmitting app...\n"
 submitApp "$huawei_app_id" "${huawei_client_id}"
 printf "\nApp submitted as a Draft - Pending of being Submitted for Review\n" 
 
-showResponseOrSubmitCompletelyAgain "$huawei_app_id" "${huawei_client_id}"
+if [ "${submit_for_review}" == true ]; then
+  showResponseOrSubmitCompletelyAgain "${huawei_app_id}" "${huawei_client_id}"
+fi
 
 exit 0
