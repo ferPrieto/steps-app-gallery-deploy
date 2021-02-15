@@ -11,6 +11,11 @@ app:
   - LANG: ${LANG}
   - SHOW_DEBUG_LOGS: ${SHOW_DEBUG_LOGS}
   - RELEASE_TYPE: ${RELEASE_TYPE}
+  - SCHEDULE_RELEASE_TIME: ${SCHEDULE_RELEASE_TIME}
+  - PHASE_RELEASE_START_TIME: ${PHASE_RELEASE_START_TIME}
+  - PHASE_RELEASE_END_TIME: ${PHASE_RELEASE_END_TIME}
+  - PHASE_RELEASE_PERCENTAGE: ${PHASE_RELEASE_PERCENTAGE}
+  - PHASE_RELEASE_DESCRIPTION: ${PHASE_RELEASE_DESCRIPTION}
   - SUBMIT_FOR_REVIEW: ${SUBMIT_FOR_REVIEW}
   # If you want to share this step into a StepLib
   - BITRISE_STEP_ID: steps-app-gallery-deploy
@@ -48,7 +53,12 @@ workflows:
         - huawei_client_secret: ${CLIENT_SECRET}
         - lang: ${LANG}
         - show_debug_logs: ${SHOW_DEBUG_LOGS}
-        - releaseType: ${RELEASE_TYPE}
+        - release_type: ${RELEASE_TYPE}
+        - schedule_release_time: ${SCHEDULE_RELEASE_TIME}
+        - phase_release_start_time: ${PHASE_RELEASE_START_TIME}
+        - phase_release_end_time: ${PHASE_RELEASE_END_TIME}
+        - phase_release_percentage: ${PHASE_RELEASE_PERCENTAGE}
+        - phase_release_description: ${PHASE_RELEASE_DESCRIPTION}
         - submit_for_review: ${SUBMIT_FOR_REVIEW}
 
   # ----------------------------------------------------------------

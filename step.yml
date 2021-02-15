@@ -88,13 +88,16 @@ inputs:
       is_expand: true
       is_required: false
 
-  - release_type: 1
+  - release_type: 
     opts:
       category: Config
       title: Release Type
       description: App release mode (1 - on the entire network | 3 - by phase)[Release Type](https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-app-submit-with-file_v2)
       is_expand: true
-      is_required: false 
+      is_required: true 
+      value_options:
+        - "Entire Network"
+        - "By Phase"
 
   - release_notes: 
     opts:
@@ -112,27 +115,35 @@ inputs:
       is_expand: true
       is_required: false 
 
-  - scheduled_release_date:
+  - schedule_release_time:
     opts:
       category: Schedule
-      title: Scheduled Release Date
+      title: Schedule Release Time
       description: The specified time is set in your local time. After you set a release time, it is automatically converted to the UTC time.
+      is_expand: true
+      is_required: false
+
+  - phase_release_start_time:
+    opts:
+      category: Phase
+      title: Phase Release Start Time
+      description: Start time of the validity period of the release by phase. The value is UTC time in the following format yyyy-MM-ddTHH:mm:ssZZ. Example:2021-02-15T13:20:15+0000.
       is_expand: true
       is_required: false 
 
-  - phase_release_percentage: 10.00
+  - phase_release_end_time: 
+    opts:
+      category: Phase
+      title: Scheduled Release Time
+      description: End time of the validity period of the release by phase. The value is UTC time in the following format yyyy-MM-ddTHH:mm:ssZZ. Example:2021-02-16T07:05:15+0000.
+      is_expand: true
+      is_required: false 
+
+  - phase_release_percentage: 
     opts:
       category: Phase
       title: Phase Release Percentage
       description: Percentage of target users of release by phase.Enter an integer or decimal greater than 0 and less than 100. The value can contain up to two decimal places. For a version released by phase, the release percentage must increase gradually for different phases.
-      is_expand: true
-      is_required: false 
-
-  - phase_release_description: 
-    opts:
-      category: Phase
-      title: Phase Description
-      description: Remarks of the phased release, such as release features, with up to 500 characters. The description is not displayed to users or Huawei reviewers. It is displayed only on the version information page for your reference.
       is_expand: true
       is_required: false 
 
