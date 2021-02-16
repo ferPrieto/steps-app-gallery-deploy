@@ -80,32 +80,16 @@ inputs:
       is_required: true
       is_sensitive: true
 
-  - lang: en-GB
-    opts:
-      category: Config
-      title: Language Type
-      description: For more languages refer to [Language Types](https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-Guides/agcapi-reference-langtype)
-      is_expand: true
-      is_required: false
-
   - release_type: 
     opts:
       category: Config
       title: Release Type
-      description: App release mode (1 - on the entire network | 3 - by phase)[Release Type](https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-app-submit-with-file_v2)
+      description: App release mode (Entire network | By phase)[Release Type](https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-References/agcapi-app-submit-with-file_v2)
       is_expand: true
       is_required: true 
       value_options:
         - "Entire Network"
         - "By Phase"
-
-  - release_notes: 
-    opts:
-      category: Config
-      title: Release Notes
-      description: Release notes to be included in the release (empty by default)
-      is_expand: true
-      is_required: false 
 
   - submit_for_review: true 
     opts:
@@ -115,19 +99,11 @@ inputs:
       is_expand: true
       is_required: false 
 
-  - schedule_release_time:
-    opts:
-      category: Schedule
-      title: Schedule Release Time
-      description: The specified time is set in your local time. After you set a release time, it is automatically converted to the UTC time.
-      is_expand: true
-      is_required: false
-
   - phase_release_start_time:
     opts:
       category: Phase
       title: Phase Release Start Time
-      description: Start time of the validity period of the release by phase. The value is UTC time in the following format yyyy-MM-ddTHH:mm:ssZZ. Example:2021-02-15T13:20:15+0000.
+      description: Start time of the validity period of the release by phase. The value is UTC time in the following format yyyy-MM-ddTHH:mm:ssZZ. Example:2021-02-17T13:20:15
       is_expand: true
       is_required: false 
 
@@ -135,7 +111,7 @@ inputs:
     opts:
       category: Phase
       title: Scheduled Release Time
-      description: End time of the validity period of the release by phase. The value is UTC time in the following format yyyy-MM-ddTHH:mm:ssZZ. Example:2021-02-16T07:05:15+0000.
+      description: End time of the validity period of the release by phase. The value is UTC time in the following format yyyy-MM-ddTHH:mm:ssZZ. Example:2021-02-20T07:05:15
       is_expand: true
       is_required: false 
 
