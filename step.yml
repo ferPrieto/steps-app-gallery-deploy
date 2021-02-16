@@ -88,8 +88,8 @@ inputs:
       is_expand: true
       is_required: true 
       value_options:
-        - "Entire Network"
-        - "By Phase"
+        - Entire Network
+        - By Phase
 
   - submit_for_review: true 
     opts:
