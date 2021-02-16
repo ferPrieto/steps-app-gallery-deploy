@@ -1,3 +1,4 @@
+![banner](art/banner.png)
 # Huawei App Gallery Deploy Step
 
 Deploy your .apk/.aab file to **Huawei App Gallery**.
@@ -6,9 +7,13 @@ Deploy your .apk/.aab file to **Huawei App Gallery**.
 
 # Upcoming features
 
-* Release App :rocket: **Already Available!** - Submit an .apk/.abb completely (not just a draft).
-* Phased Release - It will allow to select a rollout percentage and rollout start-end date.
+* Select `Submit as a Draft` or `Submit for Review` :rocket: **Already Available!** - Option that allows choosing between submitting .apk/.abb completely or just a draft.
+* Phased Release :rocket: **Already Available!** - It will allow to select a rollout percentage and rollout start-end date.
+
+# Upcoming features
+
 * Release Schedule - It will allow to select a specific date to submit the whole release.
+
 
 ## Before using the step
 
