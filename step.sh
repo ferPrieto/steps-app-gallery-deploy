@@ -8,7 +8,7 @@ fi
 
 function getToken()
 {
-  printf "\n\nObtaining a Token\n"
+  printf "\n\nObtaining a Token\n"  
   
   curl --silent -X POST \
     https://connect-api.cloud.huawei.com/api/oauth2/v1/token \
@@ -16,8 +16,8 @@ function getToken()
     -H 'cache-control: no-cache' \
     -d '{
       "grant_type": "client_credentials",
-      "client_id": "'$1'",
-      "client_secret": "'$2'"
+      "client_id": "'${huawei_client_id}'",
+      "client_secret": "'${huawei_client_secret}'"
   }' > token.json
 
   printf "\nObtaining a Token - DONE\n"
@@ -26,15 +26,28 @@ function getToken()
 function getFileUploadUrl()
 {
   ACCESS_TOKEN=`jq -r '.access_token' token.json`
+  FILE_EXT="${file_path##*.}"
+  RELEASE_TYPE=$( getReleaseTypeValue ) 
 
   printf "\nObtaining the File Upload URL\n"
 
   curl --silent -X GET \
-  'https://connect-api.cloud.huawei.com/api/publish/v2/upload-url?appId='$1'&suffix='$2 \
+  'https://connect-api.cloud.huawei.com/api/publish/v2/upload-url?appId='"${huawei_app_id}"'&suffix='"${FILE_EXT}"'&releaseType='"${RELEASE_TYPE}" \
   -H 'Authorization: Bearer '"${ACCESS_TOKEN}"'' \
-  -H 'client_id: '$3'' > uploadurl.json
+  -H 'client_id: '"${huawei_client_id}"'' > uploadurl.json
 
   printf "\nObtaining the File Upload URL - DONE\n"
+}
+
+function getReleaseTypeValue()
+{
+  if [ "${release_type}" == "By Phase" ]; then
+     releaseTypeValue=3
+  else 
+     releaseTypeValue=1
+  fi
+
+  echo $releaseTypeValue
 }
 
 function uploadFile()
@@ -50,7 +63,7 @@ function uploadFile()
     -F authCode="${UPLOAD_AUTH_CODE}" \
     -F fileCount=1 \
     -F parseType=1 \
-    -F file=@$1 > uploadfile.json
+    -F file="@${file_path}" > uploadfile.json
   
   printf "\nUploading a File - DONE\n"  
 }
@@ -61,19 +74,19 @@ function updateAppFileInfo()
   FILE_DEST_URL=`jq -r '.result.UploadFileRsp.fileInfoList[0].fileDestUlr' uploadfile.json`
   FILE_SIZE=`jq -r '.result.UploadFileRsp.fileInfoList[0].size' uploadfile.json`
 
-  printf "\nUpdating App File Information - With the previoulsy uploaded file: ${1}"
+  printf "\nUpdating App File Information - With the previoulsy uploaded file: ${huawei_filename}"
 
   curl --silent -X PUT \
-    'https://connect-api.cloud.huawei.com/api/publish/v2/app-file-info?appId='$2'' \
+    'https://connect-api.cloud.huawei.com/api/publish/v2/app-file-info?appId='"$huawei_app_id"'' \
     -H 'Authorization: Bearer '"${ACCESS_TOKEN}"'' \
     -H 'Content-Type: application/json' \
-    -H 'client_id: '$3'' \
-    -H 'releaseType: '$4'' \
+    -H 'client_id: '"${huawei_client_id}"'' \
+    -H 'releaseType: '"${releaseType}"'' \
     -d '{
     "fileType":"5",
     "files":[
       {
-        "fileName":"'$1'",
+        "fileName":"'${huawei_filename}'",
         "fileDestUrl":"'"${FILE_DEST_URL}"'",
         "size":"'"${FILE_SIZE}"'"
       }]
@@ -86,11 +99,36 @@ function submitApp()
 {  
   ACCESS_TOKEN=`jq -r '.access_token' token.json`
 
+  if [ "${release_type}" == "By Phase" ] ;then
+      submitAppPhaseMode
+  else  
+      submitAppDirectly
+  fi 
+}
+
+function submitAppPhaseMode()
+{  
+  ACCESS_TOKEN=`jq -r '.access_token' token.json`
+  RELEASE_TYPE=$( getReleaseTypeValue ) 
+  JSON_STRING="{\"phasedReleaseStartTime\":\"$phase_release_start_time+0000\",\"phasedReleaseEndTime\":\"$phase_release_end_time+0000\",\"phasedReleaseDescription\":\"$phase_release_description\",\"phasedReleasePercent\":\"$phase_release_percentage\"}"
+
   curl --silent -X  POST \
-    'https://connect-api.cloud.huawei.com/api/publish/v2/app-submit?appid='$1'' \
-    -H 'Authorization: Bearer '"${ACCESS_TOKEN}"'' \
-    -H 'client_id: '$2''> resultSubmission.json
+  'https://connect-api.cloud.huawei.com/api/publish/v2/app-submit?appid='"$huawei_app_id"'&releaseType='"${RELEASE_TYPE}" \
+  -H 'Authorization: Bearer '"${ACCESS_TOKEN}"'' \
+  -H 'Content-Type: application/json' \
+  -H 'client_id: '"${huawei_client_id}"'' \
+  -d  "${JSON_STRING}" > resultSubmission.json
 } 
+
+function submitAppDirectly()
+{  
+  ACCESS_TOKEN=`jq -r '.access_token' token.json`
+
+  curl --silent -X  POST \
+  'https://connect-api.cloud.huawei.com/api/publish/v2/app-submit?appid='"$huawei_app_id"'' \
+  -H 'Authorization: Bearer '"${ACCESS_TOKEN}"'' \
+  -H 'client_id: '"${huawei_client_id}"''> resultSubmission.json
+}
 
 function showResponseOrSubmitCompletelyAgain()
 {
@@ -99,14 +137,28 @@ function showResponseOrSubmitCompletelyAgain()
   RET_MESSAGE=`jq -r '.ret.msg' resultSubmission.json` 
 
   if [[ "${RET_CODE}" == "204144660" ]] && [[ "${RET_MESSAGE}" =~ "It may take 2-5 minutes" ]]  ;then
-    printf "\nBuild is currently processing, waiting for 2 minutes before submitting again...\n" 
-    sleep 120
-    submitApp  $1 $2
+    getSubmissionStatus  
+    SUBMISSION_STATUS=`jq -r '.aabCompileStatus' resultSubmissionStatus.json`
+    printf "Submission Status ${SUBMISSION_STATUS}"
+    i=0
+    while [[ "${SUBMISSION_STATUS}" == "1" ]] && [[ i < 8 ]]
+      do
+          sleep 60
+          SUBMISSION_STATUS = getSubmissionStatus  
+          printf "\nBuild is currently processing, waiting another minute before submitting again...\n" 
+          ((i++))
+      done
 
-    CODE=`jq -r '.ret.code' resultSubmission.json`
-    MESSAGE=`jq -r '.ret.msg' resultSubmission.json`
-    printf "\nFinal SubmitRetCode - ${CODE}\n" 
-    printf "\nFinal SubmitRetMessage - ${MESSAGE}\n" 
+    if [ "${SUBMISSION_STATUS}" == "2" ]; then
+        submitApp 
+        CODE=`jq -r '.ret.code' resultSubmission.json`
+        MESSAGE=`jq -r '.ret.msg' resultSubmission.json`
+
+        printf "\nFinal SubmitRetCode - ${CODE}\n" 
+        printf "\nFinal SubmitRetMessage - ${MESSAGE}\n" 
+    else 
+        printf "\nFailed to Submit App Completely.\n" 
+    fi 
 
   elif [[ "${RET_CODE}" == 0 ]] ;then 
     printf "\App Successfully Submitted For Review\n" 
@@ -116,23 +168,31 @@ function showResponseOrSubmitCompletelyAgain()
   fi
 }
 
-# Setup env vars
-LANG="${lang}"
-FILENAME_TO_UPLOAD="${huawei_filename}"
-FILE_EXT="${file_path##*.}"
+function getSubmissionStatus()
+{
+   ACCESS_TOKEN=`jq -r '.access_token' token.json`
+   PKG_VERSION=`jq -r '.pkgVersion[0]' result.json`
+ 
+   curl --silent -X  GET \
+   'https://connect-api.cloud.huawei.com/api/publish/v2/aab/complile/status?appId='"${huawei_app_id}"'&pkgVersion='"${PKG_VERSION}"'' \
+    -H 'Authorization: Bearer '"${ACCESS_TOKEN}"'' \
+    -H 'client_id: '"${huawei_client_id}"''> resultSubmissionStatus.json
+}    
 
-getToken  "${huawei_client_id}" "${huawei_client_secret}"
+getToken  
 
-getFileUploadUrl "${huawei_app_id}" "${FILE_EXT}" "${huawei_client_id}"
+getFileUploadUrl 
 
-uploadFile "${file_path}"
+uploadFile 
 
-updateAppFileInfo "${FILENAME_TO_UPLOAD}" "$huawei_app_id" "${huawei_client_id}" "${releaseType}"
+updateAppFileInfo 
 
 printf "\nSubmitting app...\n" 
-submitApp "$huawei_app_id" "${huawei_client_id}"
+submitApp 
 printf "\nApp submitted as a Draft - Pending of being Submitted for Review\n" 
 
-showResponseOrSubmitCompletelyAgain "$huawei_app_id" "${huawei_client_id}"
+if [ "${submit_for_review}" == true ]; then
+  showResponseOrSubmitCompletelyAgain 
+fi
 
 exit 0
