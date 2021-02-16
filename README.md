@@ -5,7 +5,7 @@ Deploy your .apk/.aab file to **Huawei App Gallery**.
 
 :robot:This is the code base of the **Verified** Bitrise Step:robot:
 
-# Upcoming features
+# Latest added features
 
 * Select `Submit as a Draft` or `Submit for Review` :rocket: **Already Available!** - Option that allows choosing between submitting .apk/.abb completely or just a draft.
 * Phased Release :rocket: **Already Available!** - It will allow to select a rollout percentage and rollout start-end date.
