@@ -80,7 +80,7 @@ inputs:
       is_required: true
       is_sensitive: true
 
-  - release_type: Entire Network
+  - release_type: "Entire Network"
     opts:
       category: Config
       title: Release Type
@@ -88,8 +88,8 @@ inputs:
       is_expand: true
       is_required: true 
       value_options:
-        - Entire Network
-        - By Phase
+        - "Entire Network"
+        - "By Phase"
 
   - submit_for_review: true 
     opts:
