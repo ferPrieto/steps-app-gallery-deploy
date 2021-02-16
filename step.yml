@@ -80,7 +80,7 @@ inputs:
       is_required: true
       is_sensitive: true
 
-  - release_type: 
+  - release_type: Entire Network
     opts:
       category: Config
       title: Release Type
