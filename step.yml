@@ -98,6 +98,9 @@ inputs:
       description: By default is marked as For Review (true). Setting to false will submit the relase as a Draft.
       is_expand: true
       is_required: false 
+      value_options:
+        - true
+        - false
 
   - phase_release_start_time:
     opts:
@@ -110,7 +113,7 @@ inputs:
   - phase_release_end_time: 
     opts:
       category: Phase
-      title: Scheduled Release Time
+      title: Phase Release End Time
       description: End time of the validity period of the release by phase. The value is UTC time in the following format yyyy-MM-ddTHH:mm:ssZZ. Example:2021-02-20T07:05:15
       is_expand: true
       is_required: false 
