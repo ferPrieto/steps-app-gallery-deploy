@@ -1,4 +1,5 @@
 .bitrise.secrets*
 _tmp/
+.bitrise_share_steps.txt
 
 
