@@ -191,7 +191,7 @@ printf "\nSubmitting app...\n"
 submitApp 
 printf "\nApp submitted as a Draft - Pending of being Submitted for Review\n" 
 
-if [ "${submit_for_review}" == true ]; then
+if [ "${submit_for_review}" == "true" ]; then
   showResponseOrSubmitCompletelyAgain 
 fi
 
