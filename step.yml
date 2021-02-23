@@ -91,16 +91,16 @@ inputs:
         - "Entire Network"
         - "By Phase"
 
-  - submit_for_review: true 
+  - submit_for_review: "true" 
     opts:
       category: Config
       title: Submit for Review
-      description: By default is marked as For Review (true). Setting to false will submit the relase as a Draft.
+      description: By default is marked as For Review ("true"). Setting to "false" will submit the relase as a Draft.
       is_expand: true
       is_required: false 
       value_options:
-        - true
-        - false
+        - "true"
+        - "false"
 
   - phase_release_start_time:
     opts:
