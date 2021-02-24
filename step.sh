@@ -147,7 +147,7 @@ function showResponseOrSubmitCompletelyAgain()
         getSubmissionStatus  
         SUBMISSION_STATUS=`jq -r '.aabCompileStatus' resultSubmissionStatus.json`
         printf "\nBuild is currently processing, waiting 20 seconds before trying to submit again...\n" 
-        ((i++))
+        ((i+=1))
     done
 
     if [ "${SUBMISSION_STATUS}" == 2 ]; then
