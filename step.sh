@@ -146,7 +146,7 @@ function showResponseOrSubmitCompletelyAgain()
         sleep 20
         getSubmissionStatus  
         SUBMISSION_STATUS=`jq -r '.aabCompileStatus' resultSubmissionStatus.json`
-        printf "\nBuild is currently processing, waiting 20 seconds before trying to submit again...\n" 
+        printf "\nBuild is currently processing, waiting 20 seconds ⏱️ before trying to submit again...\n" 
         ((i+=1))
     done
 
@@ -158,13 +158,13 @@ function showResponseOrSubmitCompletelyAgain()
         printf "\nFinal SubmitRetCode - ${CODE}\n" 
         printf "\nFinal SubmitRetMessage - ${MESSAGE}\n" 
     else 
-        printf "\nFailed to Submit App Completely.\n" 
+        printf "\nFAILED to submit the App for Review 😢\n" 
     fi 
 
   elif [[ "${RET_CODE}" == 0 ]] ;then 
-    printf "\App Successfully Submitted For Review\n" 
+    printf "\App SUCCESSFULLY SUBMITTED for Review 🎉🎊\n" 
   else 
-    printf "\nFailed to Submit App Completely.\n" 
+    printf "\nFAILED to submit the App for Review 😢\n" 
     printf "${RET_MESSAGE}"
   fi
 }
@@ -188,14 +188,13 @@ uploadFile
 
 updateAppFileInfo 
 
-printf "\nSubmitting app...\n" 
-submitApp 
+printf "\nSubmitting app as a Draft...⏳\n" 
 
 if [ "${submit_for_review}" == "true" ]; then
-  printf "\nApp submitted as a Draft - Pending to be Submitted for Review\n" 
+  submitApp 
   showResponseOrSubmitCompletelyAgain 
 else 
-  printf "\nApp successfully submitted as a Draft\n" 
+  printf "\nApp successfully submitted as a Draft 🎉\n" 
 fi
 
 exit 0
