@@ -20,7 +20,7 @@ function getToken()
       "client_secret": "'${huawei_client_secret}'"
   }' > token.json
 
-  printf "\nObtaining a Token - DONE\n"
+  printf "\nObtaining a Token ✅\n"
 } 
 
 function getFileUploadUrl()
@@ -36,7 +36,7 @@ function getFileUploadUrl()
   -H 'Authorization: Bearer '"${ACCESS_TOKEN}"'' \
   -H 'client_id: '"${huawei_client_id}"'' > uploadurl.json
 
-  printf "\nObtaining the File Upload URL - DONE\n"
+  printf "\nObtaining the File Upload URL ✅\n"
 }
 
 function getReleaseTypeValue()
@@ -65,7 +65,7 @@ function uploadFile()
     -F parseType=1 \
     -F file="@${file_path}" > uploadfile.json
   
-  printf "\nUploading a File - DONE\n"  
+  printf "\nUploading a File ✅\n"  
 }
 
 function updateAppFileInfo()
@@ -92,7 +92,7 @@ function updateAppFileInfo()
       }]
   }' > result.json
 
-  printf "\nUpdating App File Information - With the previoulsy uploaded file - DONE"
+  printf "\nUpdating App File Information - With the previoulsy uploaded file ✅"
 }
 
 function submitApp()
@@ -158,13 +158,13 @@ function showResponseOrSubmitCompletelyAgain()
         printf "\nFinal SubmitRetCode - ${CODE}\n" 
         printf "\nFinal SubmitRetMessage - ${MESSAGE}\n" 
     else 
-        printf "\nFAILED to submit the App for Review 😢\n" 
+        printf "\n❌ FAILED to submit the App for Review 😢\n" 
     fi 
 
   elif [[ "${RET_CODE}" == 0 ]] ;then 
-    printf "\App SUCCESSFULLY SUBMITTED for Review 🎉🎊\n" 
+    printf "\n🤩 App SUCCESSFULLY SUBMITTED for Review 🎉🎊\n" 
   else 
-    printf "\nFAILED to submit the App for Review 😢\n" 
+    printf "\n ❌ FAILED to submit the App for Review 😢\n" 
     printf "${RET_MESSAGE}"
   fi
 }
@@ -194,7 +194,7 @@ if [ "${submit_for_review}" == "true" ]; then
   submitApp 
   showResponseOrSubmitCompletelyAgain 
 else 
-  printf "\nApp successfully submitted as a Draft 🎉\n" 
+  printf "\n🤩 App successfully submitted as a Draft 🎉\n" 
 fi
 
 exit 0
