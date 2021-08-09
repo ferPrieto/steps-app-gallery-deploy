@@ -136,7 +136,7 @@ function showResponseOrSubmitCompletelyAgain()
   RET_CODE=`jq -r '.ret.code' resultSubmission.json`
   RET_MESSAGE=`jq -r '.ret.msg' resultSubmission.json` 
 
-  if [[ "${RET_CODE}" == 204144660 ]] && [[ "${RET_MESSAGE}" =~ "It may take 2-5 minutes" ]]  ;then
+  if [[ "${RET_CODE}" == 204144727 ]] ;then
     getSubmissionStatus  
     SUBMISSION_STATUS=`jq -r '.aabCompileStatus' resultSubmissionStatus.json`
     printf "Submission Status ${SUBMISSION_STATUS}"
