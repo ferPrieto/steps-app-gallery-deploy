@@ -97,6 +97,7 @@ function updateAppFileInfo()
 
 function submitApp()
 {  
+  sleep 30s
   ACCESS_TOKEN=`jq -r '.access_token' token.json`
 
   if [ "${release_type}" == "By Phase" ] ;then
