@@ -21,6 +21,7 @@ Make sure you set up your project as `N/A`. To do so, in App Gallery Connect sel
 
 Add the role `Administrator` to this new `API Client` created.
 
+[![Screenshot](create-an-api-client.png)](https://developer.huawei.com/consumer/en/doc/development/AppGallery-connect-Guides/agcapi-getstarted-0000001111845114)
 
 ## How to use this Step
 
