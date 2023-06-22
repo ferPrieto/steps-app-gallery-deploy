@@ -21,13 +21,13 @@ function getToken() {
 
   if [[ -z "$response" ]]; then
     printf "\n ❌ Failed to obtain a token. Check your network connection and credentials 😢\n"
-    exit 1 
+    exit 1
   fi
 
   echo "$response" >token.json
 
   CODE=$(jq -r '.ret.code' token.json)
-  if [ "${CODE}" != "null" ] &&  [ "${CODE}" != "0" ]; then
+  if [ "${CODE}" != "null" ] && [ "${CODE}" != "0" ]; then
     printf "\n ❌ Failed to obtain a token 😢\n"
     echo "$response"
     exit 1
@@ -56,7 +56,7 @@ function getFileUploadUrl() {
   echo "$response" >uploadurl.json
 
   CODE=$(jq -r '.ret.code' uploadurl.json)
-  if [ "${CODE}" != "null" ] &&  [ "${CODE}" != "0" ]; then
+  if [ "${CODE}" != "null" ] && [ "${CODE}" != "0" ]; then
     printf "\n ❌ Failed to obtain the file upload URL. 😢\n"
     echo "$response"
     exit 1
@@ -103,8 +103,6 @@ function uploadFile() {
     exit 1
   fi
 
-
-
   printf "Uploading a File ✅\n"
 }
 
@@ -135,7 +133,7 @@ function updateAppFileInfo() {
     printf "\n ❌ Failed to update app file information. Check your network connection and parameters 😢\n"
     exit 1
   fi
-  
+
   echo "$response" >result.json
 
   CODE=$(jq -r '.ret.code' result.json)
@@ -227,12 +225,12 @@ function showResponseOrSubmitCompletelyAgain() {
     SUBMISSION_STATUS=$(jq -r '.aabCompileStatus' resultSubmissionStatus.json)
     printf "Submission Status ${SUBMISSION_STATUS}"
     i=0
-    while (( "${SUBMISSION_STATUS}" == 1 && i < 16 )); do
+    while (("${SUBMISSION_STATUS}" == 1 && i < 16)); do
       sleep 20
       getSubmissionStatus
       SUBMISSION_STATUS=$(jq -r '.aabCompileStatus' resultSubmissionStatus.json)
       printf "\nBuild is currently processing, waiting 20 seconds ⏱️ before trying to submit again...\n"
-      ((i+=1))
+      ((i += 1))
     done
 
     if [ "${SUBMISSION_STATUS}" == 2 ]; then
