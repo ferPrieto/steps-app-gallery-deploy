@@ -82,7 +82,7 @@ function uploadFile() {
   printf "\nUploading a File...\n"
 
   
-  if [ ! -e "$filename" ]; then
+  if [ ! -f "$filename" ]; then
       printf "\n ❌ File '$filename' does not exist 😢\n"
       exit 1
   fi
