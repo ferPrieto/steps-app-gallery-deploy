@@ -81,6 +81,12 @@ function uploadFile() {
 
   printf "\nUploading a File...\n"
 
+  
+  if [ ! -e "$filename" ]; then
+      printf "\n ❌ File '$filename' does not exist 😢\n"
+      exit 1
+  fi
+
   response=$(curl --silent -X POST \
     "${UPLOAD_URL}" \
     -H 'Accept: application/json' \
