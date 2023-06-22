@@ -81,10 +81,9 @@ function uploadFile() {
 
   printf "\nUploading a File...\n"
 
-  
   if [ ! -f "$file_path" ]; then
-      printf "\n ❌ File '$file_path' does not exist 😢\n"
-      exit 1
+    printf "\n ❌ File '$file_path' does not exist 😢\n"
+    exit 1
   fi
 
   response=$(curl --silent -X POST \
@@ -129,7 +128,7 @@ function updateAppFileInfo() {
     "fileType":"5",
     "files":[
       {
-        "fileName":"'${huawei_filename}'",
+        "fileName":"'"$huawei_filename"'",
         "fileDestUrl":"'"${FILE_DEST_URL}"'",
         "size":"'"${FILE_SIZE}"'"
       }]
