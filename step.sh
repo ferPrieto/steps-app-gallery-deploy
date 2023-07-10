@@ -20,7 +20,7 @@ function getToken() {
   }' || true)
 
   if [[ -z "$response" ]]; then
-    printf "\n ❌ Failed to obtain a token. Check your network connection and credentials 😢\n"
+    printf "\n ❌ Failed to obtain a token from AppGallery Connect. Check your network connection and credentials 😢\n"
     exit 1
   fi
 
@@ -28,7 +28,7 @@ function getToken() {
 
   CODE=$(jq -r '.ret.code' token.json)
   if [ "${CODE}" != "null" ] && [ "${CODE}" != "0" ]; then
-    printf "\n ❌ Failed to obtain a token 😢\n"
+    printf "\n ❌ Failed to obtain a token from AppGallery Connect 😢\n. Please check response for details.\n"
     echo "$response"
     exit 1
   fi
