@@ -20,7 +20,7 @@ function getToken() {
   }' || true)
 
   if [[ -z "$response" ]]; then
-    printf "\n ❌ Failed to obtain a token from AppGallery Connect. Check your network connection and credentials 😢\n"
+    printf "\n ❌ An error occurred while obtaining a token from AppGallery Connect. Check your network connection and your credentials 😢\n"
     exit 1
   fi
 
@@ -28,7 +28,7 @@ function getToken() {
 
   CODE=$(jq -r '.ret.code' token.json)
   if [ "${CODE}" != "null" ] && [ "${CODE}" != "0" ]; then
-    printf "\n ❌ Failed to obtain a token from AppGallery Connect 😢\n. Please check response for details.\n"
+    printf "\n ❌ An error occurred while obtaining a token from AppGallery Connect 😢\n. Please check the response for further details.\n"
     echo "$response"
     exit 1
   fi
@@ -49,7 +49,7 @@ function getFileUploadUrl() {
     -H 'client_id: '"${huawei_client_id}"'' || true)
 
   if [[ -z "$response" ]]; then
-    printf "\n ❌ Failed to obtain the file upload URL. Check your network connection and parameters 😢\n"
+    printf "\n ❌ An error occurred while obtaining the file upload URL. Check your network connection and the parameters used 😢\n"
     exit 1
   fi
 
@@ -57,7 +57,7 @@ function getFileUploadUrl() {
 
   CODE=$(jq -r '.ret.code' uploadurl.json)
   if [ "${CODE}" != "null" ] && [ "${CODE}" != "0" ]; then
-    printf "\n ❌ Failed to obtain the file upload URL. 😢\n"
+    printf "\n ❌ An error occurred while obtaining the file upload URL. 😢\n"
     echo "$response"
     exit 1
   fi
@@ -95,7 +95,7 @@ function uploadFile() {
     -F file="@${file_path}" || true)
 
   if [[ -z "$response" ]]; then
-    printf "\n ❌ Failed to upload the file. Check your network connection and file path 😢\n"
+    printf "\n ❌ An error occurred while uploading the file. Check your network connection and file path 😢\n"
     exit 1
   fi
 
@@ -103,7 +103,7 @@ function uploadFile() {
 
   CODE=$(jq -r '.result.UploadFileRsp.ifSuccess' uploadfile.json)
   if [ "${CODE}" != "1" ]; then
-    printf "\n ❌ Failed to upload the file.. 😢\n"
+    printf "\n ❌ An error occurred while uploading the file.. 😢\n"
     echo "$response"
     exit 1
   fi
@@ -116,7 +116,7 @@ function updateAppFileInfo() {
   FILE_DEST_URL=$(jq -r '.result.UploadFileRsp.fileInfoList[0].fileDestUlr' uploadfile.json)
   FILE_SIZE=$(jq -r '.result.UploadFileRsp.fileInfoList[0].size' uploadfile.json)
 
-  printf "\nUpdating App File Information - With the previously uploaded file: '${huawei_filename}'\n"
+  printf "\nUpdating the App File Information with the previous uploaded file: '${huawei_filename}'\n"
 
   response=$(curl --silent -X PUT \
     'https://connect-api.cloud.huawei.com/api/publish/v2/app-file-info?appId='"$huawei_app_id"'' \
@@ -135,7 +135,7 @@ function updateAppFileInfo() {
   }' || true)
 
   if [[ -z "$response" ]]; then
-    printf "\n ❌ Failed to update app file information. Check your network connection and parameters 😢\n"
+    printf "\n ❌ An error occurred while updating the app file information. Check your network connection and the parameters used😢\n"
     exit 1
   fi
 
@@ -143,12 +143,12 @@ function updateAppFileInfo() {
 
   CODE=$(jq -r '.ret.code' result.json)
   if [ "${CODE}" != "0" ]; then
-    printf "\n ❌ Failed to update app file information 😢\n"
+    printf "\n ❌ An error occurred while updating the app file information 😢\n"
     echo "$response"
     exit 1
   fi
 
-  printf "Updating App File Information - With the previously uploaded file ✅\n"
+  printf "Updating the App File Information with the previous uploaded file ✅\n"
 }
 
 function submitApp() {
@@ -176,7 +176,7 @@ function submitAppPhaseMode() {
     -d "${JSON_STRING}" || true)
 
   if [[ -z "$response" ]]; then
-    printf "\n ❌ Failed to submit the app in phased release mode. Check your network connection and parameters 😢\n"
+    printf "\n ❌ An error occurred while submitting the app in phased release mode. Check your network connection and the parameters used 😢\n"
     exit 1
   fi
 
@@ -194,7 +194,7 @@ function submitAppDirectly() {
     -H 'client_id: '"${huawei_client_id}"'' || true)
 
   if [[ -z "$response" ]]; then
-    printf "\n ❌ Failed to submit the app directly. Check your network connection and parameters 😢\n"
+    printf "\n ❌ An error occurred while directly submitting the app. Check your network connection and the parameters used 😢\n"
     exit 1
   fi
 
@@ -205,7 +205,7 @@ function getSubmissionStatus() {
   ACCESS_TOKEN=$(jq -r '.access_token' token.json)
   PKG_VERSION=$(jq -r '.pkgVersion[0]' result.json)
 
-  printf "\nGetting submission status...\n"
+  printf "\nGetting the submission status...\n"
 
   response=$(curl --silent -X GET \
     'https://connect-api.cloud.huawei.com/api/publish/v2/aab/complile/status?appId='"${huawei_app_id}"'&pkgVersion='"${PKG_VERSION}"'' \
@@ -213,7 +213,7 @@ function getSubmissionStatus() {
     -H 'client_id: '"${huawei_client_id}"'' || true)
 
   if [[ -z "$response" ]]; then
-    printf "\n ❌ Failed to get submission status. Check your network connection and parameters 😢\n"
+    printf "\n ❌ An error occurred while getting the submission status. Check your network connection and the parameters used😢\n"
     exit 1
   fi
 
@@ -234,7 +234,7 @@ function showResponseOrSubmitCompletelyAgain() {
       sleep 20
       getSubmissionStatus
       SUBMISSION_STATUS=$(jq -r '.aabCompileStatus' resultSubmissionStatus.json)
-      printf "\nBuild is currently processing, waiting 20 seconds ⏱️ before trying to submit again...\n"
+      printf "\nThe Build is currently processing, waiting 20 seconds ⏱️ before trying to submit again...\n"
       ((i += 1))
     done
 
@@ -269,7 +269,7 @@ function getSubmissionStatus() {
     -H 'client_id: '"${huawei_client_id}"'' || true)
 
   if [[ -z "$response" ]]; then
-    printf "\n ❌ Failed to get submission status. Check your network connection and parameters 😢\n"
+    printf "\n ❌ An error occurred while getting the submission status. Check your network connection and the parameters used 😢\n"
     exit 1
   fi
 
@@ -290,7 +290,7 @@ if [ "${submit_for_review}" == "true" ]; then
   submitApp
   showResponseOrSubmitCompletelyAgain
 else
-  printf "\n🤩 App successfully submitted as a Draft 🎉\n"
+  printf "\n🤩 Your app was successfully submitted as a Draft 🎉\n"
 fi
 
 exit 0
