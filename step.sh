@@ -208,7 +208,7 @@ function getSubmissionStatus() {
   printf "\nGetting the submission status...\n"
 
   response=$(curl --silent -X GET \
-    'https://connect-api.cloud.huawei.com/api/publish/v2/aab/complile/status?appId='"${huawei_app_id}"'&pkgVersion='"${PKG_VERSION}"'' \
+    'https://connect-api.cloud.huawei.com/api/publish/v2/aab/complile/status?appId='"${huawei_app_id}"'&pkgIds='"${PKG_VERSION}"'' \
     -H 'Authorization: Bearer '"${ACCESS_TOKEN}"'' \
     -H 'client_id: '"${huawei_client_id}"'' || true)
 
@@ -264,7 +264,7 @@ function getSubmissionStatus() {
   printf "\nGetting submission status...\n"
 
   response=$(curl --silent -X GET \
-    'https://connect-api.cloud.huawei.com/api/publish/v2/aab/complile/status?appId='"${huawei_app_id}"'&pkgVersion='"${PKG_VERSION}"'' \
+    'https://connect-api.cloud.huawei.com/api/publish/v2/aab/complile/status?appId='"${huawei_app_id}"'&pkgIds='"${PKG_VERSION}"'' \
     -H 'Authorization: Bearer '"${ACCESS_TOKEN}"'' \
     -H 'client_id: '"${huawei_client_id}"'' || true)
 
