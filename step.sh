@@ -29,7 +29,26 @@ function getFileUploadUrl()
   FILE_EXT="${file_path##*.}"
   RELEASE_TYPE=$( getReleaseTypeValue ) 
 
-  printf "\nObtaining the File Upload URL\n"
+  # Debug information
+  if [ "${show_debug_logs}" == "yes" ]; then
+    printf "\n[DEBUG] File path: ${file_path}\n"
+    printf "[DEBUG] Extracted file extension: '${FILE_EXT}'\n"
+    printf "[DEBUG] Extension length: ${#FILE_EXT}\n"
+    printf "[DEBUG] Release type: ${RELEASE_TYPE}\n"
+  fi
+
+  # Validate file extension length (must be between 1 and 6 characters)
+  if [ ${#FILE_EXT} -lt 1 ] || [ ${#FILE_EXT} -gt 6 ]; then
+    printf "\n❌ Error: File extension '${FILE_EXT}' is invalid. Must be between 1 and 6 characters.\n"
+    printf "File path: ${file_path}\n"
+    printf "Common valid extensions: apk, aab\n"
+    exit 1
+  fi
+
+  # Convert extension to lowercase for consistency
+  FILE_EXT=$(echo "${FILE_EXT}" | tr '[:upper:]' '[:lower:]')
+
+  printf "\nObtaining the File Upload URL for file extension: ${FILE_EXT}\n"
 
   curl --silent -X GET \
   'https://connect-api.cloud.huawei.com/api/publish/v2/upload-url?appId='"${huawei_app_id}"'&suffix='"${FILE_EXT}"'&releaseType='"${RELEASE_TYPE}" \

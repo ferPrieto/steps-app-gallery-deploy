@@ -70,7 +70,7 @@ inputs:
     opts:
       category: Config
       title: Client ID
-      description: Client ID generated in `AppGallery Connect -> Users and permissions -> API key -> Connect API -> API client`
+      description: Client ID generated in `AppGallery Connect -> Users and permissions -> API key -> Connect API -> API client`. For 19-digit Client IDs, wrap the value in quotes to avoid precision issues.
       is_expand: true
       is_required: true
 
