@@ -26,7 +26,7 @@ function getToken() {
 
   echo "$response" >token.json
 
-  CODE=$(jq -r '.ret.code' token.json)
+  CODE=$(jq -r '.ret.code' token.json 2>/dev/null || echo "null")
   if [ "${CODE}" != "null" ] && [ "${CODE}" != "0" ]; then
     printf "\n ❌ An error occurred while obtaining a token from AppGallery Connect 😢\n. Please check the response for further details.\n"
     echo "$response"
@@ -41,7 +41,6 @@ function getFileUploadUrl() {
   FILE_EXT="${file_path##*.}"
   RELEASE_TYPE=$(getReleaseTypeValue)
 
-<<<<<<< HEAD
   # Debug information
   if [ "${show_debug_logs}" == "yes" ]; then
     printf "\n[DEBUG] File path: ${file_path}\n"
@@ -75,7 +74,7 @@ function getFileUploadUrl() {
 
   echo "$response" >uploadurl.json
 
-  CODE=$(jq -r '.ret.code' uploadurl.json)
+  CODE=$(jq -r '.ret.code' uploadurl.json 2>/dev/null || echo "null")
   if [ "${CODE}" != "null" ] && [ "${CODE}" != "0" ]; then
     printf "\n ❌ An error occurred while obtaining the file upload URL. 😢\n"
     echo "$response"
@@ -121,9 +120,9 @@ function uploadFile() {
 
   echo "$response" >uploadfile.json
 
-  CODE=$(jq -r '.result.UploadFileRsp.ifSuccess' uploadfile.json)
+  CODE=$(jq -r '.result.UploadFileRsp.ifSuccess' uploadfile.json 2>/dev/null || echo "0")
   if [ "${CODE}" != "1" ]; then
-    printf "\n ❌ An error occurred while uploading the file.. 😢\n"
+    printf "\n ❌ An error occurred while uploading the file. 😢\n"
     echo "$response"
     exit 1
   fi
@@ -161,7 +160,7 @@ function updateAppFileInfo() {
 
   echo "$response" >result.json
 
-  CODE=$(jq -r '.ret.code' result.json)
+  CODE=$(jq -r '.ret.code' result.json 2>/dev/null || echo "null")
   if [ "${CODE}" != "0" ]; then
     printf "\n ❌ An error occurred while updating the app file information 😢\n"
     echo "$response"
@@ -228,12 +227,12 @@ function getSubmissionStatus() {
   printf "\nGetting the submission status...\n"
 
   response=$(curl --silent -X GET \
-    'https://connect-api.cloud.huawei.com/api/publish/v2/aab/complile/status?appId='"${huawei_app_id}"'&pkgIds='"${PKG_VERSION}"'' \
+    'https://connect-api.cloud.huawei.com/api/publish/v2/aab/complile/status?appId='"${huawei_app_id}"'&pkgVersion='"${PKG_VERSION}"'' \
     -H 'Authorization: Bearer '"${ACCESS_TOKEN}"'' \
     -H 'client_id: '"${huawei_client_id}"'' || true)
 
   if [[ -z "$response" ]]; then
-    printf "\n ❌ An error occurred while getting the submission status. Check your network connection and the parameters used😢\n"
+    printf "\n ❌ An error occurred while getting the submission status. Check your network connection and the parameters used 😢\n"
     exit 1
   fi
 
@@ -242,26 +241,26 @@ function getSubmissionStatus() {
 
 function showResponseOrSubmitCompletelyAgain() {
   ACCESS_TOKEN=$(jq -r '.access_token' token.json)
-  RET_CODE=$(jq -r '.ret.code' resultSubmission.json)
-  RET_MESSAGE=$(jq -r '.ret.msg' resultSubmission.json)
+  RET_CODE=$(jq -r '.ret.code' resultSubmission.json 2>/dev/null || echo "null")
+  RET_MESSAGE=$(jq -r '.ret.msg' resultSubmission.json 2>/dev/null || echo "null")
 
   if [[ "${RET_CODE}" == 204144727 ]]; then
     getSubmissionStatus
-    SUBMISSION_STATUS=$(jq -r '.aabCompileStatus' resultSubmissionStatus.json)
+    SUBMISSION_STATUS=$(jq -r '.aabCompileStatus' resultSubmissionStatus.json 2>/dev/null || echo "null")
     printf "Submission Status ${SUBMISSION_STATUS}"
     i=0
     while (("${SUBMISSION_STATUS}" == 1 && i < 16)); do
       sleep 20
       getSubmissionStatus
-      SUBMISSION_STATUS=$(jq -r '.aabCompileStatus' resultSubmissionStatus.json)
+      SUBMISSION_STATUS=$(jq -r '.aabCompileStatus' resultSubmissionStatus.json 2>/dev/null || echo "null")
       printf "\nThe Build is currently processing, waiting 20 seconds ⏱️ before trying to submit again...\n"
       ((i += 1))
     done
 
     if [ "${SUBMISSION_STATUS}" == 2 ]; then
       submitApp
-      CODE=$(jq -r '.ret.code' resultSubmission.json)
-      MESSAGE=$(jq -r '.ret.msg' resultSubmission.json)
+      CODE=$(jq -r '.ret.code' resultSubmission.json 2>/dev/null || echo "null")
+      MESSAGE=$(jq -r '.ret.msg' resultSubmission.json 2>/dev/null || echo "null")
 
       printf "\nFinal SubmitRetCode - ${CODE}\n"
       printf "\nFinal SubmitRetMessage - ${MESSAGE}\n"
@@ -277,24 +276,7 @@ function showResponseOrSubmitCompletelyAgain() {
   fi
 }
 
-function getSubmissionStatus() {
-  ACCESS_TOKEN=$(jq -r '.access_token' token.json)
-  PKG_VERSION=$(jq -r '.pkgVersion[0]' result.json)
 
-  printf "\nGetting submission status...\n"
-
-  response=$(curl --silent -X GET \
-    'https://connect-api.cloud.huawei.com/api/publish/v2/aab/complile/status?appId='"${huawei_app_id}"'&pkgIds='"${PKG_VERSION}"'' \
-    -H 'Authorization: Bearer '"${ACCESS_TOKEN}"'' \
-    -H 'client_id: '"${huawei_client_id}"'' || true)
-
-  if [[ -z "$response" ]]; then
-    printf "\n ❌ An error occurred while getting the submission status. Check your network connection and the parameters used 😢\n"
-    exit 1
-  fi
-
-  echo "$response" >resultSubmissionStatus.json
-}
 
 getToken
 
